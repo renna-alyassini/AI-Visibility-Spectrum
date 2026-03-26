@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spectrum of AI Visibility — Field Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #e8e4dc;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 32px 64px;
+  font-family: 'Architects Daughter', 'Marker Felt Thin', 'Bradley Hand', 'Segoe Print', cursive;
+}
+
+.page {
+  width: 1056px;
+  min-height: 816px;
+  background: #ffffff;
+  padding: 44px 60px 44px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.1), 0 12px 32px rgba(0,0,0,0.14), 0 32px 64px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOP BAR ── */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 72px;
+}
+.series-label { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: #ccc; }
+.page-num     { font-size: 9px; letter-spacing: 0.1em; color: #ccc; }
+
+/* ── TITLE BAND ── */
+.title-band {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 72px;
+
+}
+.title-eyebrow { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #bbb; margin-bottom: 6px; }
+.page-title    { font-size: 32px; color: #111; line-height: 1.1; }
+.title-sub     { font-size: 11px; color: #aaa; letter-spacing: 0.04em; padding-bottom: 5px; }
+
+.rule { width: 100%; height: 1px; background: #111; margin-bottom: 40px; display: none; }
+
+/* ── SPECTRUM BAR ── */
+.spectrum-block { margin-bottom: 72px; }
+.spectrum-axis-label {
+  font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: #ccc; margin-bottom: 7px;
+}
+.spectrum-endpoints { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.endpoint-label { font-size: 8.5px; letter-spacing: 0.14em; text-transform: uppercase; color: #bbb; }
+.spectrum-svg { width: 100%; height: 9px; display: block; }
+
+.spectrum-ticks { display: flex; justify-content: space-between; }
+.tick { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.tick:first-child { align-items: flex-start; }
+.tick:last-child  { align-items: flex-end; }
+.tick-mark  { width: 1px; height: 5px; background: #111; margin-bottom: 4px; }
+.tick-class { font-size: 10.5px; color: #111; text-align: center; white-space: nowrap; margin-bottom: 2px; }
+.tick-label { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #bbb; text-align: center; white-space: nowrap; }
+.tick:first-child .tick-class,
+.tick:first-child .tick-label { text-align: left; }
+.tick:last-child .tick-class,
+.tick:last-child .tick-label  { text-align: right; }
+
+/* ── THE GRID ──
+   5 columns × 6 rows.
+   Each child is explicitly placed via grid-column + grid-row.
+   This guarantees every row snaps to the same baseline regardless of content.
+*/
+.classes-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows:
+    auto   /* row 1: index */
+    auto   /* row 2: name */
+    auto   /* row 3: tagline */
+    1px    /* row 4: rule */
+    1fr    /* row 5: definition — stretches to fill */
+    auto;  /* row 6: examples */
+  
+  margin-top: 4px;
+}
+
+/* Column dividers — right border on every cell in cols 1-4 */
+.g-index.c1, .g-name.c1, .g-tagline.c1, .g-rule.c1, .g-def.c1, .g-ex.c1,
+.g-index.c2, .g-name.c2, .g-tagline.c2, .g-rule.c2, .g-def.c2, .g-ex.c2,
+.g-index.c3, .g-name.c3, .g-tagline.c3, .g-rule.c3, .g-def.c3, .g-ex.c3,
+.g-index.c4, .g-name.c4, .g-tagline.c4, .g-rule.c4, .g-def.c4, .g-ex.c4 {
+  border-right: 0.5px solid #e8e8e8;
+}
+
+/* Shared horizontal padding */
+.g-index, .g-name, .g-tagline, .g-rule, .g-def, .g-ex {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+/* First col flush left */
+.g-index.c1, .g-name.c1, .g-tagline.c1, .g-rule.c1, .g-def.c1, .g-ex.c1 { padding-left: 0; }
+/* Last col flush right */
+.g-index.c5, .g-name.c5, .g-tagline.c5, .g-rule.c5, .g-def.c5, .g-ex.c5 { padding-right: 0; }
+
+/* Row 1: index number */
+.g-index {
+  grid-row: 1;
+  font-size: 8.5px; letter-spacing: 0.16em; color: #ccc;
+  padding-top: 14px; padding-bottom: 4px;
+  align-self: end;
+}
+
+/* Row 2: class name */
+.g-name {
+  grid-row: 2;
+  font-size: 16px; color: #111; line-height: 1.1;
+  padding-bottom: 4px;
+  align-self: start;
+  white-space: nowrap;
+}
+
+/* Row 3: tagline */
+.g-tagline {
+  grid-row: 3;
+  font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #aaa;
+  padding-bottom: 10px;
+  align-self: start;
+  white-space: nowrap;
+}
+
+/* Row 4: decorative rule */
+.g-rule {
+  grid-row: 4;
+  background: #e0e0e0;
+  align-self: stretch;
+  margin-left: 18px; margin-right: 18px;
+}
+.g-rule.c1 { margin-left: 0; }
+.g-rule.c5 { margin-right: 0; }
+
+/* Row 6: examples */
+.g-ex {
+  grid-row: 6;
+  font-size: 9.5px; color: #aaa; line-height: 1.6;
+  padding-top: 6px; padding-bottom: 14px;
+  align-self: start;
+}
+/* Row 5: definition — tighten bottom */
+.g-def {
+  grid-row: 5;
+  font-size: 11px; color: #333; line-height: 1.65;
+  padding-top: 12px; padding-bottom: 6px;
+  align-self: start;
+}
+
+/* Column positions */
+.c1 { grid-column: 1; }
+.c2 { grid-column: 2; }
+.c3 { grid-column: 3; }
+.c4 { grid-column: 4; }
+.c5 { grid-column: 5; }
+
+/* ── FOOTER ── */
+.page-footer {
+  padding-top: 16px;
+  border-top: 0.5px solid #e8e8e8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+.footer-sig  { font-size: 10px; color: #ccc; letter-spacing: 0.06em; }
+.footer-copy { font-size: 9px;  color: #ddd; letter-spacing: 0.06em; }
+.footer-date { font-size: 9px;  color: #ccc; letter-spacing: 0.1em;  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-bar">
+    <span class="series-label">Field Notes · AI Design</span>
+    <span class="page-num"></span>
+  </div>
+
+  <div class="title-band">
+    <div>
+      <div class="title-eyebrow">A spectrum of AI integration</div>
+      <h1 class="page-title">Spectrum of AI Visibility</h1>
+    </div>
+    <div class="title-sub">invisible to user &nbsp;→&nbsp; primary interface</div>
+  </div>
+
+  <div class="rule"></div>
+
+  <div class="spectrum-block">
+    <div class="spectrum-axis-label">AI visibility to user</div>
+    <div class="spectrum-endpoints">
+      <span class="endpoint-label">Invisible</span>
+      <span class="endpoint-label">Primary Interface</span>
+    </div>
+    <svg class="spectrum-svg" viewBox="0 0 936 9" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <polygon points="0,4 936,0 936,9 0,5" fill="#111"/>
+    </svg>
+    <div class="spectrum-ticks">
+      <div class="tick"><div class="tick-mark"></div><div class="tick-class">AI-Ambient</div><div class="tick-label">Invisible</div></div>
+      <div class="tick"><div class="tick-mark"></div><div class="tick-class">AI-Embedded</div><div class="tick-label">Signaled</div></div>
+      <div class="tick"><div class="tick-mark"></div><div class="tick-class">AI-Assisted</div><div class="tick-label">Just-in-time</div></div>
+      <div class="tick"><div class="tick-mark"></div><div class="tick-class">AI-Elective</div><div class="tick-label">Elective</div></div>
+      <div class="tick"><div class="tick-mark"></div><div class="tick-class">AI-Native</div><div class="tick-label">Primary</div></div>
+    </div>
+  </div>
+
+  <!-- Grid: every element is a direct child with explicit grid-column + grid-row -->
+  <div class="classes-grid">
+
+    <!-- ROW 1: index -->
+    <div class="g-index c1">01</div>
+    <div class="g-index c2">02</div>
+    <div class="g-index c3">03</div>
+    <div class="g-index c4">04</div>
+    <div class="g-index c5">05</div>
+
+    <!-- ROW 2: name -->
+    <div class="g-name c1">AI-Ambient</div>
+    <div class="g-name c2">AI-Embedded</div>
+    <div class="g-name c3">AI-Assisted</div>
+    <div class="g-name c4">AI-Elective</div>
+    <div class="g-name c5">AI-Native</div>
+
+    <!-- ROW 3: tagline -->
+    <div class="g-tagline c1">Invisible · Backend</div>
+    <div class="g-tagline c2">Visible · Signaled</div>
+    <div class="g-tagline c3">Just-in-time · In-context</div>
+    <div class="g-tagline c4">Optional · Host Product</div>
+    <div class="g-tagline c5">Primary · Standalone</div>
+
+    <!-- ROW 4: rule -->
+    <div class="g-rule c1"></div>
+    <div class="g-rule c2"></div>
+    <div class="g-rule c3"></div>
+    <div class="g-rule c4"></div>
+    <div class="g-rule c5"></div>
+
+    <!-- ROW 5: definition -->
+    <div class="g-def c1">AI powers part of the host product but the user may not know it's there. No badge, no disclaimer, no sparkle icon. Results just seem better.</div>
+    <div class="g-def c2">AI is visibly marked — badges, "AI-powered" labels, sparkle icons. No discrete CTA. Woven into the product, and the user knows it's there.</div>
+    <div class="g-def c3">AI surfaces a specific suggestion in context — inside a host product the user is already in. Uninvoked.</div>
+    <div class="g-def c4">An optional AI capability inside a host product. The user elects to use it — never on by default. It has its own UI surface: a button, a sidebar, a panel.</div>
+    <div class="g-def c5">The entire product is the AI. No host product. AI is the interface, the value, and the interaction model. The user's relationship is with the AI itself.</div>
+
+    <!-- ROW 6: examples -->
+    <div class="g-ex c1">Smart inbox sorting · Predictive caching · Fraud scoring · Recommendation ranking · Spotify Discover · Netflix ordering</div>
+    <div class="g-ex c2">ServiceNow AI-classified tickets · Jira smart priority · LinkedIn "AI-generated" labels · Figma AI badge</div>
+    <div class="g-ex c3">Grammarly inline corrections · GitHub Copilot ghost text · Superhuman Instant Reply · Apple Smart Compose</div>
+    <div class="g-ex c4">Copilot sidebar in Word · "Summarize" in Notion · Salesforce Einstein panel · Confluence Audio Briefings</div>
+    <div class="g-ex c5">Claude · ChatGPT · Gemini · Perplexity · Midjourney · Cursor · Runway</div>
+
+  </div>
+
+  <div class="page-footer">
+    <span class="footer-sig">Renna Al-Yassini</span>
+    <span class="footer-copy">© 2026 Renna Al-Yassini · All rights reserved</span>
+    <span class="footer-date">March 2026</span>
+  </div>
+
+</div>
+</body>
+</html>
